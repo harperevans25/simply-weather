@@ -5,7 +5,6 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ChatRight, Crosshair, Wind, X, GeoAltFill } from 'react-bootstrap-icons';
 import Cookies from 'js-cookie';
-import { Helmet } from 'react-helmet';
 
 function App() {
 
@@ -36,9 +35,6 @@ function App() {
 
   return (
     <div className="App">
-      <Helmet>
-        <link rel="apple-touch-icon" href="/app_logo.png" />
-      </Helmet>
       <SettingsView />
       <header className="app-header">
         <LocationUpdater location={location} setLocation={setLocation} setHourlyWeather={setHourlyWeather} />
