@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ChatRight, Crosshair, Wind, X, GeoAltFill } from 'react-bootstrap-icons';
 import Cookies from 'js-cookie';
+import { Helmet } from 'react-helmet';
 
 function App() {
 
