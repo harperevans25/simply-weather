@@ -37,7 +37,7 @@ function App() {
   return (
     <div className="App">
       <Helmet>
-        <link rel="apple-touch-icon" href="/app_icon.png" />
+        <link rel="apple-touch-icon" href="/app_logo.png" />
       </Helmet>
       <SettingsView />
       <header className="app-header">
