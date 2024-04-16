@@ -35,6 +35,9 @@ function App() {
 
   return (
     <div className="App">
+      <Helmet>
+        <link rel="apple-touch-icon" href="/app_icon.png" />
+      </Helmet>
       <SettingsView />
       <header className="app-header">
         <LocationUpdater location={location} setLocation={setLocation} setHourlyWeather={setHourlyWeather} />
