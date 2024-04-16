@@ -25,7 +25,6 @@ function App() {
   // Load token from cookie on component mount
   useEffect(() => {
     const savedToken = Cookies.get('googlePlacesToken');
-    console.log(savedToken)
     if (savedToken) {
       setToken(savedToken);
     }
@@ -469,7 +468,6 @@ const AnimatedHourlyWeatherList = ({ hourlyWeather, selectedHourlyForecast }) =>
 
         // Fade out the existing cards
         for (let index = visibleCards.length - 1; index >= 0; index--) {
-          console.log(`REMOVING: ${index}`);
           await new Promise(resolve => {
             setTimeout(() => {
               setVisibleCards(prevCards => {
@@ -488,7 +486,6 @@ const AnimatedHourlyWeatherList = ({ hourlyWeather, selectedHourlyForecast }) =>
             return updatedCards;
           });
         }
-        console.log('Done Removing Cards');
 
         // After all cards are removed, add new cards
         const newCards = hourlyWeather[selectedHourlyForecast].hourly_data.map(card => ({ ...card, opacity: 0 }));
@@ -496,7 +493,6 @@ const AnimatedHourlyWeatherList = ({ hourlyWeather, selectedHourlyForecast }) =>
 
         // Fade in the new cards one at a time
         for (let index = 0; index < newCards.length; index++) {
-          console.log(`ADDING: ${index}`)
           await new Promise(resolve => {
             setTimeout(() => {
               setVisibleCards(prevCards => {
@@ -508,7 +504,6 @@ const AnimatedHourlyWeatherList = ({ hourlyWeather, selectedHourlyForecast }) =>
             }, animationDelay * 1000); // Convert to milliseconds
           });
         }
-        console.log('Done Adding Cards')
         isManagingCards.current = false;
       };
 
