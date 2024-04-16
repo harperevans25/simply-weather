@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Button, ButtonGroup, Spinner, Modal } from 'react-bootstrap';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { Crosshair, Wind } from 'react-bootstrap-icons';
+import { ChatRight, Crosshair, Wind, X, GeoAltFill } from 'react-bootstrap-icons';
 import Cookies from 'js-cookie';
 
 function App() {
@@ -29,7 +29,7 @@ function App() {
     if (savedToken) {
       setToken(savedToken);
     }
-    else{
+    else {
       setShowModal(true);
     }
   }, []);
@@ -132,6 +132,7 @@ const SettingsView = () => {
 const LocationUpdater = ({ location, setLocation, setHourlyWeather }) => {
   const inputRef = useRef({});
   const [loading, setLoading] = useState(false);
+  const [locationServicesEnabled, setLocationServicesEnabled] = useState(true);
   const scriptLoading = useRef(false);
 
   useEffect(() => {
@@ -203,9 +204,11 @@ const LocationUpdater = ({ location, setLocation, setHourlyWeather }) => {
           switch (error.code) {
             case error.PERMISSION_DENIED:
               errorMessage = 'User denied the request for Geolocation.';
+              setLocationServicesEnabled(false);
               break;
             case error.POSITION_UNAVAILABLE:
               errorMessage = 'Location information is unavailable.';
+              setLocationServicesEnabled(false);
               break;
             case error.TIMEOUT:
               errorMessage = 'The request to get user location timed out.';
@@ -222,10 +225,9 @@ const LocationUpdater = ({ location, setLocation, setHourlyWeather }) => {
       );
     } else {
       console.error('Geolocation is not supported by this browser.');
+      setLocationServicesEnabled(false);
     }
   };
-
-
 
   return (
     <div className="search-container">
@@ -235,14 +237,29 @@ const LocationUpdater = ({ location, setLocation, setHourlyWeather }) => {
         className="search-input"
         ref={inputRef}
       />
-      {loading ? <Spinner className='search-spinner' /> :
-        <button className="search-button" onClick={updateLocation}>
-          <Crosshair size={25} className="search-icon" />
-        </button>
-      }
+      {locationServicesEnabled ? (
+        loading ? (
+          <Spinner className='search-spinner' />
+        ) : (
+          <button className="search-button" onClick={updateLocation}>
+            <Crosshair size={25} className="search-icon" />
+          </button>
+        )
+      ) : (
+        <LocationOff size={30} />
+      )}
     </div>
   );
 };
+
+const LocationOff = ({ size }) => {
+  return (
+    <div style={{ position: 'absolute', display: 'inline-block', right:'10px', top:'8px' }}>
+      <GeoAltFill size={size} style={{ position: 'relative', zIndex: 1 }} />
+      <X size={size*1.75} style={{ position: 'absolute', top: "-40%", left: "-35%", zIndex: 2, color: '#FF0000' }} />
+    </div>
+  );
+}
 
 const DataApi = ({
   location,
@@ -461,7 +478,7 @@ const AnimatedHourlyWeatherList = ({ hourlyWeather, selectedHourlyForecast }) =>
                 return updatedCards;
               });
               resolve();
-            }, animationDelay/2 * 1000); // Convert to milliseconds
+            }, animationDelay / 2 * 1000); // Convert to milliseconds
           });
 
           // Remove the card from the array after animation is complete
@@ -502,12 +519,12 @@ const AnimatedHourlyWeatherList = ({ hourlyWeather, selectedHourlyForecast }) =>
   return (
     <div className="hourly-entry-wrapper hourly-data-entry-wrapper">
       {visibleCards.map((card, index) => (
-        
-          <HourlyDataEntry
-            entry={card}
-            key={index}
-            extraClass={`hourly-card ${card.opacity === 1 ? 'visible' : 'hidden'} `}
-            />
+
+        <HourlyDataEntry
+          entry={card}
+          key={index}
+          extraClass={`hourly-card ${card.opacity === 1 ? 'visible' : 'hidden'} `}
+        />
       ))}
     </div>
   );
