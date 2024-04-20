@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { ChatRight, Crosshair, Wind, X, GeoAltFill } from 'react-bootstrap-icons';
 import Cookies from 'js-cookie';
+import city_json from "./city_json.json";
 
 function App() {
 
@@ -35,7 +36,6 @@ function App() {
 
   return (
     <div className="App">
-      <SettingsView />
       <header className="app-header">
         <LocationUpdater location={location} setLocation={setLocation} setHourlyWeather={setHourlyWeather} />
       </header>
@@ -129,6 +129,143 @@ const SettingsView = () => {
 };
 
 const LocationUpdater = ({ location, setLocation, setHourlyWeather }) => {
+  const [inputValue, setInputValue] = useState('');
+  const inputRef = useRef(null); // Use useRef instead of useState for inputRef
+  const [loading, setLoading] = useState(false);
+  const [locationServicesEnabled, setLocationServicesEnabled] = useState(true);
+  const [cityData, setCityData] = useState(null);
+  const [topResults, setTopResults] = useState([]);
+  const scriptLoading = useRef(false);
+
+  useEffect(() => {
+    updateLocation();
+    const fetchData = async () => {
+      try {
+        // const response = await fetch('/city_json.json'); // Adjust the path accordingly
+        const data = city_json;
+        setCityData(data.places);
+      } catch (error) {
+        console.error('Error fetching city file:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (inputValue !== '' && cityData) {
+      // Filter the city data based on the user input
+      const filteredCities = cityData.filter(city => city.name.toLowerCase().startsWith(inputValue.toLowerCase()));
+
+      // Assuming you want to get the top 5 results
+      const results = filteredCities.slice(0, 5).map(city => ({ name: city.name, coordinates: city.coordinates }));
+
+      // Update topResults state
+      setTopResults(results);
+      if (results.length > 0) {
+        if (results[0].name.toLowerCase() === inputValue.toLowerCase()) {
+          setTopResults([]);
+          setLocation({ 'latitude': results[0].coordinates.lat, 'longitude': results[0].coordinates.lon });
+        }
+      } else {
+        // Clear topResults if inputValue is empty
+        setTopResults([]);
+      }
+    }
+  }, [inputValue, cityData]);
+
+  const updateLocation = () => {
+    setTopResults([]);
+    setLoading(true);
+    setLocation(null);
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setInputValue('');
+          inputRef.current.placeholder = 'Using Current Location'; // Set placeholder
+          setLoading(false);
+          setLocation({ latitude, longitude });
+        },
+        (error) => {
+          let errorMessage = 'Unknown error occurred.';
+          switch (error.code) {
+            case error.PERMISSION_DENIED:
+              errorMessage = 'User denied the request for Geolocation.';
+              setLocationServicesEnabled(false);
+              break;
+            case error.POSITION_UNAVAILABLE:
+              errorMessage = 'Location information is unavailable.';
+              setLocationServicesEnabled(false);
+              break;
+            case error.TIMEOUT:
+              errorMessage = 'The request to get user location timed out.';
+              break;
+            case error.UNKNOWN_ERROR:
+              errorMessage = 'An unknown error occurred.';
+              break;
+            default:
+              errorMessage = 'An error occurred while getting the location.';
+              break;
+          }
+          console.error('Error getting location:', errorMessage);
+        }
+      );
+    } else {
+      console.error('Geolocation is not supported by this browser.');
+      setLocationServicesEnabled(false);
+    }
+  };
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+  };
+
+  const handleResultClick = (selectedCity) => {
+    setInputValue(selectedCity.name);
+    setLocation({ 'latitude': selectedCity.coordinates.lat, 'longitude': selectedCity.coordinates.lon });
+    setTopResults([]); // Clear topResults after selecting a city
+  };
+
+  return (
+    <div className="search-container">
+      <input
+        type="text"
+        placeholder="Search..."
+        className="search-input"
+        ref={inputRef}
+        value={inputValue}
+        onChange={handleInputChange}
+      />
+      {topResults.length > 0 && (
+        <div className="search-results">
+          {topResults.map((city, index) => (
+            <div
+              key={index}
+              className="search-result"
+              onClick={() => handleResultClick(city)}
+            >
+              {city.name}
+            </div>
+          ))}
+        </div>
+      )}
+      {locationServicesEnabled ? (
+        loading ? (
+          <Spinner className='search-spinner' />
+        ) : (
+          <button className="search-button" onClick={updateLocation}>
+            <Crosshair size={25} className="search-icon" />
+          </button>
+        )
+      ) : (
+        <LocationOff size={30} />
+      )}
+    </div>
+  );
+};
+
+const OldLocationUpdater = ({ location, setLocation, setHourlyWeather }) => {
   const inputRef = useRef({});
   const [loading, setLoading] = useState(false);
   const [locationServicesEnabled, setLocationServicesEnabled] = useState(true);
@@ -253,9 +390,9 @@ const LocationUpdater = ({ location, setLocation, setHourlyWeather }) => {
 
 const LocationOff = ({ size }) => {
   return (
-    <div style={{ position: 'absolute', display: 'inline-block', right:'10px', top:'8px' }}>
+    <div style={{ position: 'absolute', display: 'inline-block', right: '10px', top: '8px' }}>
       <GeoAltFill size={size} style={{ position: 'relative', zIndex: 1 }} />
-      <X size={size*1.75} style={{ position: 'absolute', top: "-40%", left: "-35%", zIndex: 2, color: '#FF0000' }} />
+      <X size={size * 1.75} style={{ position: 'absolute', top: "-40%", left: "-35%", zIndex: 2, color: '#FF0000' }} />
     </div>
   );
 }

@@ -44,6 +44,26 @@
   max-width: 600px;
 }
 
+.search-results {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  width: 100%;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.search-result {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.search-result:hover {
+  background-color: #f0f0f0;
+}
+
 .search-button {
   position: absolute;
   top: 5px;
