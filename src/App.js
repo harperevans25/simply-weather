@@ -71,14 +71,6 @@ function App() {
         setGridId={setGridId}
         setHourlyWeather={setHourlyWeather}
       />
-      <Modal show={showModal} onHide={handleCloseModal}>
-        <Modal.Header closeButton className="custom-modal-header">
-          <Modal.Title>APP NOTICE</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <p>No Google Places API Key found, please go to settings and put one in or the app may not work as expected.</p>
-        </Modal.Body>
-      </Modal>
     </div>
   );
 }
