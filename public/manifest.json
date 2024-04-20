@@ -3,6 +3,11 @@
   "name": "Simply Weather, just weather",
   "icons": [
     {
+      "src": "favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "16x16 24x24 32x32 64x64 128x128"
+    },
+    {
       "src": "app_logo.png",
       "type": "image/png",
       "sizes": "180x180"
